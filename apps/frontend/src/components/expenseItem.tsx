@@ -77,6 +77,7 @@ export default function ExpenseItem({ expense, isEdit}: { expense: ExpenseObj, i
               className='w-full my-2 text-lg bg-gray-100 read-only:bg-white'
             />
         </div>
+        <p className='text-sm flex text-gray-400 my-1'> {new Date(expense.createdAt).toLocaleString()}  </p>
         {isEditBtn ? 
         <button 
         type="button" 

@@ -8,30 +8,40 @@ export interface ExpenseObj {
   comment? : string
   _id: number
   __v: number
+  createdAt: Date
+  updatedAt: Date
 }
 
 const initialState : ExpenseObj = {
-  expenseAmount: 0
-  owner: ""
-  _id: -1
-  __v: -1
+  expenseAmount: 0,
+  owner: "",
+  _id: -1,
+  __v: -1,
+  createdAt : new Date(),
+  updatedAt : new Date(),
 }
 
 export const expenseSlice = createSlice({
   name: 'intro',
   initialState,
   reducers: {
-    setImage: (state, action: PayloadAction<string>) => {
-      state.image = action.payload
+    setExpense: (state, action: PayloadAction<ExpenseObj>) => {
+      state = action.payload
     },
-    setDescription: (state, action: PayloadAction<string>) => {
-      state.description = action.payload
+    setExpenseAmount: (state, action: PayloadAction<number>) => {
+      state.expenseAmount = action.payload
+    },
+    setOwner: (state, action: PayloadAction<string>) => {
+      state.owner = action.payload
+    },
+    setComment: (state, action: PayloadAction<string>) => {
+      state.comment = action.payload
     },
   },
 })
 
-export const { setImage, setDescription } = expenseSlice.actions
-export const selectImg = (state: RootState) => state.intro.image
-export const selectDescription = (state: RootState) => state.intro.description
+export const { setExpense, setExpenseAmount, setOwner, setComment } = expenseSlice.actions
+// export const selectImg = (state: RootState) => state.intro.image
+// export const selectDescription = (state: RootState) => state.intro.description
 
 export default expenseSlice.reducer

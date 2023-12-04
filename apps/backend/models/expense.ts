@@ -5,6 +5,8 @@ const expenseSchema = new Schema({
   expenseAmount: { type: Number, required: true },
   comment: { type: String },
   owner: { type: String, required: true },
+}, {
+  timestamps: true
 });
 
 
