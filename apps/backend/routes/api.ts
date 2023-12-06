@@ -1,5 +1,5 @@
 import express from 'express';
-
+import {} from '../types/customTypes'
 const Expense = require('../models/expense');
 const isAuthenticated = require('../middlewares/isAuthenticated');
 const apiRouter = express.Router();
@@ -8,7 +8,7 @@ apiRouter.post('/add', isAuthenticated, async function(req, res){
   try{
     const {expenseAmount, comment} = req.body;
     const owner = req.user!.username;
-    const exp = new Expense({expenseAmount, owner, comment});
+    const exp = new Expense({expenseAmount, sharedAmount: expenseAmount, owner, comment});
     await exp.save();
     res.send("Expense successfully saved!");
 
@@ -17,6 +17,7 @@ apiRouter.post('/add', isAuthenticated, async function(req, res){
     res.status(500).send("Error creading expense!");
   }
 })
+
 
 apiRouter.put('/:id', isAuthenticated, async function(req, res){
   try{
@@ -30,6 +31,23 @@ apiRouter.put('/:id', isAuthenticated, async function(req, res){
   } catch (err) {
     console.error(err);
     res.status(500).send("Error updating expense!");
+  }
+})
+
+apiRouter.patch('/share/:id', isAuthenticated, async function(req, res){
+  try{
+    const {expenseAmount, sharedUsers} = req.body;
+    const owner = req.user!.username;
+    const sharedAmount = expenseAmount / (sharedUsers.length + 1.0);
+    // TODO verify username correct
+    // add to User.sharedUsers
+    const exp = {sharedUsers, sharedAmount};
+    await Expense.findByIdAndUpdate(req.params.id, exp);
+    res.send("Expense successfully shared!");
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Error sharing expense!");
   }
 })
 
@@ -57,7 +75,9 @@ apiRouter.delete('/:id', isAuthenticated, async function(req, res){
 
 apiRouter.get('/', isAuthenticated, async function(req, res){
   try{
-    const exps = await Expense.find({owner: req.user!.username,});
+    // const exps = await Expense.find({owner: req.user!.username,});
+    const exps = await Expense.find({$or:[ {owner:req.user!.username}, 
+      {$expr: {$in: [req.user!.username, "$sharedUsers"]}} ]});
     res.send(exps)
   } catch (err) {
     console.error(err);
@@ -65,9 +85,91 @@ apiRouter.get('/', isAuthenticated, async function(req, res){
   }
 })
 
+apiRouter.get('/monthly', isAuthenticated, async function(req, res){
+  try{
+    const exps = await Expense.aggregate([
+      {
+        $match: {$or: [ {owner:req.user!.username}, 
+          {$expr: {$in: [req.user!.username, "$sharedUsers"]}} ]
+        }
+      },
+      { $group: {
+          _id: {
+            $dateToString: {
+              format: "%m-%d",
+              date: "$createdAt",
+              timezone: "America/New_York"
+            }
+          },
+          dayTotal: { $sum: "$sharedAmount" }
+        }
+      },
+      {
+        $project: {
+          _id: 0,
+          date: '$_id',
+          dayTotal: 1,
+        },
+      },
+      { $sort: {
+        "date": 1
+        },
+      }
+      
+    ]);
+    // console.error(exps);
+    res.send(exps)
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Error getting montly!");
+  }
+})
+
+apiRouter.get('/yearly', isAuthenticated, async function(req, res){
+  try{
+    const exps = await Expense.aggregate([
+      {
+        $match: {$or: [ {owner:req.user!.username}, 
+          {$expr: {$in: [req.user!.username, "$sharedUsers"]}} ]
+        }
+      },
+      { $group: {
+          _id: {
+            $dateToString: {
+              format: "%Y-%m",
+              date: "$createdAt",
+              timezone: "America/New_York"
+            }
+          },
+          monthTotal: { $sum: "$expenseAmount" }
+        }
+      },
+      {
+        $project: {
+          _id: 0,
+          date: '$_id',
+          monthTotal: 1,
+        },
+      },
+      { $sort: {
+        "date": 1
+        },
+      }
+      
+    ]);
+    // console.error(exps);
+    res.send(exps)
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Error getting yearly!");
+  }
+})
+
 apiRouter.get('/:name', isAuthenticated, async function(req, res){
   try{
-    const exps = await Expense.find({owner: req.params.name,});
+    // const exps = await Expense.find({owner: req.params.name,});
+    const exps = await Expense.find({$or:[ {owner:req.params.name}, 
+                        {$expr: {$in: [req.params.name, "$sharedUsers"]}} ]});
     res.send(exps)
   } catch (err) {
     console.error(err);

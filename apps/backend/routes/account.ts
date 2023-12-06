@@ -33,8 +33,8 @@ accountsRouter.post("/signup", async function(req, res){
   }
 })
 
-accountsRouter.get('/login', function(req, res){
-  return res.send(`get login page`);
+accountsRouter.get('/username', function(req, res){
+  return res.send(req.user!.username);
 });
 
 accountsRouter.post("/login", function (req, res, next) {
@@ -67,6 +67,16 @@ accountsRouter.post('/logout', function(req, res, next){
     }
     res.status(200).send(`Logout success!`);
   });
+});
+
+accountsRouter.get('/users', async function(req, res){
+  try{
+    const us = await User.find({});
+    res.send(us)
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Error getting users!");
+  }
 });
 
 

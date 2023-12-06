@@ -7,11 +7,11 @@ export default function TopBar({ isLoggedIn }: { isLoggedIn: Boolean }) {
   const [isLogoutBtn, setLogoutBtn] = useState(false);
   const [isSignupBtn, setSignupBtn] = useState(false);
 
-  
+
   return(
     <div >
       {isLoggedIn ? 
-        <div className="flex flex-row mx-auto rounded  py-4">
+        <div className="flex flex-row justify-end mx-auto rounded  py-4">
           <button 
             type="button" 
             onClick={() => setLogoutBtn(true)} 
@@ -21,7 +21,7 @@ export default function TopBar({ isLoggedIn }: { isLoggedIn: Boolean }) {
           </button>
         </div>
        : 
-        <div className="flex flex-row mx-auto rounded  py-4">
+        <div className="flex flex-row justify-end mx-auto rounded  py-4">
           <button 
             type="button" 
             onClick={() => navigate("/signup")} 

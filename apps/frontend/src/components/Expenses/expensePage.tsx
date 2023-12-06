@@ -1,10 +1,24 @@
-import { ExpenseObj } from "../features/expenses/expenseSlice";
+import { ExpenseObj } from "../../features/expenses/expenseSlice";
 import ExpenseItem from "./expenseItem";
 import { useEffect, useState } from "react";
 import NewExpense from "./newExpense";
+import axios from "axios";
 
 export default function ExpensePage({ expenses }: { expenses : ExpenseObj[] }) {
   const [isNewBtn, setNewBtn] = useState(false);
+  const [usrName, setUsrName] = useState("");
+  useEffect(() => {
+    
+    axios.get('api/username')
+      .then(function (response: any) {
+        console.log(response.data);
+        setUsrName(response.data);
+      })
+      .catch(function (error: any) {
+        console.log(error);
+      });
+  }, [])
+
 
   return(
     <div className="flex flex-col w-1/2">
@@ -22,10 +36,10 @@ export default function ExpensePage({ expenses }: { expenses : ExpenseObj[] }) {
       {isNewBtn ? 
         <NewExpense cancelFunc={setNewBtn} /> : <></> }
       </div>
-      {expenses.map((data, key) => {
+      {expenses.map((exp, key) => {
           return (
-            <div key={key}>
-              <ExpenseItem expense={data} isEdit={false}/>
+            <div key={exp._id}>
+              <ExpenseItem expense={exp} username={usrName}/>
             </div>
           );  
       })}

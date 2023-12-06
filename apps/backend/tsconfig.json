@@ -30,6 +30,6 @@
   },
   "files": [
     "./types/customTypes.d.ts"
-  ]
+  ],
   // "include": ["./types/customTypes.d.ts"]
 }
