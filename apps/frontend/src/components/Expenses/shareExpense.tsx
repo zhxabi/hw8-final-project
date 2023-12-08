@@ -1,5 +1,5 @@
 import axios from "axios";
-import { ExpenseObj, UserObj } from "../../features/expenses/expenseSlice";
+import { ExpenseObj, UserObj } from "../types/expenseTypes.d";
 import ExpenseItem from "./expenseItem";
 import { useEffect, useState } from "react";
 import { Multiselect } from "multiselect-react-dropdown";

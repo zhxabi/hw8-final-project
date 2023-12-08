@@ -6,7 +6,7 @@ import ErrMessage from "./errmessage";
 import TopBar from "./topbar";
 import ExpensePage from "./Expenses/expensePage";
 import InsightPage from "./Insights/insightPage";
-import { ExpenseObj } from "../features/expenses/expenseSlice";
+import { ExpenseObj } from "./types/expenseTypes.d";
 
 export default function HomePage() {
   const [errMessage, setErrMessage] = useState("");
@@ -27,7 +27,7 @@ export default function HomePage() {
     //   });
     // }, 500)
     // return () => clearInterval(intervalID)
-    
+
     axios.get('api/expenses')
       .then(function (response: any) {
         console.log(response.data);

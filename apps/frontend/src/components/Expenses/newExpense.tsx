@@ -1,4 +1,4 @@
-import { ExpenseObj } from "../../features/expenses/expenseSlice";
+import { ExpenseObj } from "../types/expenseTypes.d";
 import ExpenseItem from "./expenseItem";
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";

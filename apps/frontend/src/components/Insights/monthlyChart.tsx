@@ -1,4 +1,4 @@
-import { ExpenseObj, MonthlySumObj } from "../../features/expenses/expenseSlice";
+import { ExpenseObj, MonthlySumObj } from "../types/expenseTypes.d";
 import ExpenseItem from "../Expenses/expenseItem";
 import { useEffect, useState } from "react";
 import NewExpense from "../Expenses/newExpense";

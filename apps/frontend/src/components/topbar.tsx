@@ -1,5 +1,7 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
+import axios from "axios";
+import { comment } from "postcss";
 
 export default function TopBar({ isLoggedIn }: { isLoggedIn: Boolean }) {
   const navigate = useNavigate();
@@ -7,6 +9,20 @@ export default function TopBar({ isLoggedIn }: { isLoggedIn: Boolean }) {
   const [isLogoutBtn, setLogoutBtn] = useState(false);
   const [isSignupBtn, setSignupBtn] = useState(false);
 
+  useEffect(() => {
+    if(isLogoutBtn){
+      axios.post('api/logout', )
+      .then(function (response: any) {
+        console.log(response);
+        navigate(0);
+      })
+      .catch(function (error: any) {
+        console.log(error);
+      });
+      setLogoutBtn(false)
+
+    } 
+  }, [isLogoutBtn]);
 
   return(
     <div >

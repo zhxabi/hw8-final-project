@@ -1,5 +1,5 @@
 import axios from "axios";
-import { ExpenseObj, MonthlySumObj } from "../../features/expenses/expenseSlice";
+import { ExpenseObj, MonthlySumObj } from "../types/expenseTypes.d";
 import MonthlyChart from "./monthlyChart";
 import { useEffect, useState } from "react";
 import FriendsChart from "./friendsChart";
