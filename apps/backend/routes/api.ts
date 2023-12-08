@@ -88,13 +88,19 @@ apiRouter.get('/', isAuthenticated, async function(req, res){
 apiRouter.get('/categories', isAuthenticated, async function(req, res){
   try{
     const exps = await Expense.aggregate([
+      {
+        $match: {$or: [ {owner:req.user!.username}, 
+          {$expr: {$in: [req.user!.username, "$sharedUsers"]}} ]
+        }
+      },
+      { $unwind: "$categories" },
       { $group: {
         _id: "$categories",  
       }},
       {
         $project: {
           _id: 0,
-          category: { $first: "$_id" }
+          category:"$_id",
         },
       }      
     ]);

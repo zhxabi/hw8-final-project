@@ -28,7 +28,7 @@ export default function ExpensePage({ expenses }: { expenses : ExpenseObj[] }) {
           }).map(function(e: { [x: string]: any; }) {
           return e['category'];
         })
-        )
+        );
       })
       .catch(function (error: any) {
         console.log(error);
