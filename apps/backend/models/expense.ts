@@ -6,6 +6,7 @@ const expenseSchema = new Schema({
   sharedAmount:  { type: Number },
   comment: { type: String },
   owner: { type: String, required: true },
+  categories: [{ type: String, ref: 'Categories'}],
   // sharedUsers: [{ type: Schema.Types.ObjectId, ref: 'Shared'}]
   sharedUsers: [{ type: String, ref: 'Shared'}]
 }, {

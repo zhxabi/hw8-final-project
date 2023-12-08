@@ -6,9 +6,9 @@ const apiRouter = express.Router();
 
 apiRouter.post('/add', isAuthenticated, async function(req, res){
   try{
-    const {expenseAmount, comment} = req.body;
+    const {expenseAmount, comment, categories} = req.body;
     const owner = req.user!.username;
-    const exp = new Expense({expenseAmount, sharedAmount: expenseAmount, owner, comment});
+    const exp = new Expense({expenseAmount, sharedAmount: expenseAmount, owner, comment, categories});
     await exp.save();
     res.send("Expense successfully saved!");
 
@@ -21,10 +21,10 @@ apiRouter.post('/add', isAuthenticated, async function(req, res){
 
 apiRouter.put('/:id', isAuthenticated, async function(req, res){
   try{
-    const {expenseAmount, comment} = req.body;
+    const {expenseAmount, comment, categories} = req.body;
     // const owner = req.user!.username;
     // const expenses = await Expense.find({_id: _id});
-    const exp = {expenseAmount: expenseAmount, comment: comment};
+    const exp = {expenseAmount, comment, categories};
     await Expense.findByIdAndUpdate(req.params.id, exp, {new:true, upsert:true});
     res.send("Expense successfully saved!");
 
@@ -78,14 +78,64 @@ apiRouter.get('/', isAuthenticated, async function(req, res){
     // const exps = await Expense.find({owner: req.user!.username,});
     const exps = await Expense.find({$or:[ {owner:req.user!.username}, 
       {$expr: {$in: [req.user!.username, "$sharedUsers"]}} ]});
-    res.send(exps)
+    res.send(exps.reverse())
   } catch (err) {
     console.error(err);
     res.status(500).send("Error getting expenses!");
   }
 })
 
-apiRouter.get('/monthly', isAuthenticated, async function(req, res){
+apiRouter.get('/categories', isAuthenticated, async function(req, res){
+  try{
+    const exps = await Expense.aggregate([
+      { $group: {
+        _id: "$categories",  
+      }},
+      {
+        $project: {
+          _id: 0,
+          category: { $first: "$_id" }
+        },
+      }      
+    ]);
+    res.send(exps)
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Error getting categories!");
+  }
+})
+
+apiRouter.get('/stats/categories', isAuthenticated, async function(req, res){
+  try{
+    const exps = await Expense.aggregate([
+      {
+        $match: {$or: [ {owner:req.user!.username}, 
+          {$expr: {$in: [req.user!.username, "$sharedUsers"]}} ]
+        }
+      },
+      { $unwind: "$categories" },
+      { $group: {
+        _id: "$categories",  
+        total: { $sum: "$sharedAmount" }
+      }},
+      {
+        $project: {
+          _id: 0,
+          category:"$_id",
+          total: 1
+        },
+      }      
+    ]);
+    console.log(exps);
+    res.send(exps)
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Error getting categories!");
+  }
+})
+
+
+apiRouter.get('/stats/monthly', isAuthenticated, async function(req, res){
   try{
     const exps = await Expense.aggregate([
       {
@@ -118,6 +168,36 @@ apiRouter.get('/monthly', isAuthenticated, async function(req, res){
       
     ]);
     // console.error(exps);
+    res.send(exps)
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Error getting montly!");
+  }
+})
+
+apiRouter.get('/stats/shared', isAuthenticated, async function(req, res){
+  try{
+    const exps = await Expense.aggregate([
+      {
+        $match: {$or: [ {owner:req.user!.username}, 
+          {$expr: {$in: [req.user!.username, "$sharedUsers"]}} ]
+        }
+      },
+      { $group: {
+        _id: "$sharedUsers",  
+        count: {
+          $sum: 1
+        }
+      }},
+      {
+        $project: {
+          _id: 0,
+          users: { $first: "$_id" }
+          ,
+          count: 1,
+        },
+      }      
+    ]);
     res.send(exps)
   } catch (err) {
     console.error(err);

@@ -26,7 +26,7 @@ export default function LoginPage() {
       })
       .catch(function (error: any) {
         console.log(error);
-        setErrMessage(error.response.data)
+        setErrMessage(error.response.data.message)
         setIsErr(true);
       });
       setSubmitBtn(false)

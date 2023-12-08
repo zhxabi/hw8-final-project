@@ -45,7 +45,7 @@ accountsRouter.post("/login", function (req, res, next) {
     }
     if (!user) {
       if(info.name === "IncorrectPasswordError") {
-        return res.status(406).send(info.message);
+        return res.status(406).send(info);
       }
       return res.status(404).send(info);
     }

@@ -2,9 +2,9 @@ import { ExpenseObj, MonthlySumObj } from "../../features/expenses/expenseSlice"
 import ExpenseItem from "../Expenses/expenseItem";
 import { useEffect, useState } from "react";
 import NewExpense from "../Expenses/newExpense";
-import { Bar, Line } from "react-chartjs-2";
+import { Bar, Line, Pie } from "react-chartjs-2";
+import { Chart as ChartJS } from 'chart.js/auto'
 import {
-  Chart as ChartJS,
   CategoryScale,
   LinearScale,
   PointElement,
@@ -33,7 +33,7 @@ const options = {
     },
     title: {
       display: true,
-      text: 'Spending by Day',
+      text: 'Most Shared Users',
     },
   },
   animation: {
@@ -47,30 +47,34 @@ const options = {
 };
 
 
-export default function MonthlyChart() {
+export default function FriendsChart() {
   const [chartData, setChartData] = useState({
     labels: [] as String[], 
     datasets: [
       {
         label: "monthly",
-        data: [0],
+        data: [] as number[],
         borderColor: 'rgb(255, 99, 132)',
+        backgroundColor:  'rgba(255, 159, 64, 0.2)',
+        barPercentage: 0.6,
         borderWidth: 2
       }
     ]
   });
 
-  useEffect(() => {
 
+  useEffect(() => {
     const fetchData = async () => {
       const labs : String[] = [];
       const amnts : number[] = [];
-      await axios.get('api/expenses/stats/monthly')
+      await axios.get('api/expenses/stats/shared')
       .then(function (response: any) {
         
         for ( let dataObj of response.data ) {
-          labs.push(dataObj.date);
-          amnts.push(dataObj.dayTotal);
+          if (dataObj.users) {
+            labs.push(dataObj.users);
+            amnts.push(dataObj.count);
+          }
         }
       })
       .catch(function (error: any) {
@@ -80,9 +84,11 @@ export default function MonthlyChart() {
         labels: labs, 
         datasets: [
           {
-            label: "monthly",
+            label: "friends",
             data: amnts,
-            borderColor: 'rgb(255, 99, 132)',
+            borderColor: 'rgb(255, 159, 64)',
+            backgroundColor:  'rgba(255, 159, 64, 0.2)',
+            barPercentage: 0.5,
             borderWidth: 2
           }
         ]
@@ -93,10 +99,9 @@ export default function MonthlyChart() {
   }, [])
 
 
-
   return(
     <div className="mx-3 px-3">
-      <Line
+      <Bar
         redraw={true}
         data={chartData}
         options={options}

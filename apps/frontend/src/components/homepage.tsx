@@ -27,6 +27,7 @@ export default function HomePage() {
     //   });
     // }, 500)
     // return () => clearInterval(intervalID)
+    
     axios.get('api/expenses')
       .then(function (response: any) {
         console.log(response.data);

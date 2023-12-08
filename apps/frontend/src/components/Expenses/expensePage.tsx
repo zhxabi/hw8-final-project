@@ -7,16 +7,41 @@ import axios from "axios";
 export default function ExpensePage({ expenses }: { expenses : ExpenseObj[] }) {
   const [isNewBtn, setNewBtn] = useState(false);
   const [usrName, setUsrName] = useState("");
+  const [cats, setCats] = useState([]);
+
   useEffect(() => {
-    
     axios.get('api/username')
       .then(function (response: any) {
-        console.log(response.data);
+        // console.log(response.data);
         setUsrName(response.data);
       })
       .catch(function (error: any) {
         console.log(error);
       });
+
+      axios.get('api/expenses/categories')
+      .then(function (response: any) {
+        // console.log(response.data);
+        setCats(response.data.filter(function(e: any) {
+            return e.category;
+          }).map(function(e: { [x: string]: any; }) {
+          return e['category'];
+        })
+        )
+      })
+      .catch(function (error: any) {
+        console.log(error);
+      });
+      
+      // console.log(cats);
+      // axios.get('api/username')
+      // .then(function (response: any) {
+      //   // console.log(response.data);
+      //   setUsrName(response.data);
+      // })
+      // .catch(function (error: any) {
+      //   console.log(error);
+      // });
   }, [])
 
 
@@ -38,8 +63,8 @@ export default function ExpensePage({ expenses }: { expenses : ExpenseObj[] }) {
       </div>
       {expenses.map((exp, key) => {
           return (
-            <div key={exp._id}>
-              <ExpenseItem expense={exp} username={usrName}/>
+            <div key={key}>
+              <ExpenseItem expense={exp} username={usrName} cats={cats}/>
             </div>
           );  
       })}

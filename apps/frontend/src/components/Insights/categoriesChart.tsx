@@ -1,17 +1,19 @@
 import { ExpenseObj, MonthlySumObj } from "../../features/expenses/expenseSlice";
 import ExpenseItem from "../Expenses/expenseItem";
 import { useEffect, useState } from "react";
-import NewExpense from "../Expenses/newExpense";
-import { Bar, Line } from "react-chartjs-2";
+import { Bar, Line, Pie, Doughnut} from "react-chartjs-2";
+import { Chart as ChartJS } from 'chart.js/auto'
+
 import {
-  Chart as ChartJS,
   CategoryScale,
   LinearScale,
   PointElement,
   LineElement,
+  ArcElement,
   Title,
   Tooltip,
   Legend,
+  Colors
 } from 'chart.js';
 import axios from "axios";
 
@@ -20,9 +22,11 @@ ChartJS.register(
   LinearScale,
   PointElement,
   LineElement,
+  ArcElement,
   Title,
   Tooltip,
-  Legend
+  Legend,
+  Colors
 );
 
 const options = {
@@ -31,46 +35,67 @@ const options = {
     legend: {
       display: false,
     },
+    colors: {
+      enabled: true,
+      forceOverride: true,
+    },
     title: {
       display: true,
-      text: 'Spending by Day',
+      text: 'Spending by Category',
     },
   },
   animation: {
     duration: 500
   },
-  scales: {
-    y: {
-      suggestedMin: 0,
-    }
-  }
+  // scales: {
+  //   y: {
+  //     suggestedMin: 0,
+  //   }
+  // }
+};
+
+// function randomColorGenerator(a: number): string[] { 
+//   var pool = [];
+//     for(let i = 0; i < a; i++) {
+//         pool.push((Math.random().toString(16) + '0000000').slice(2, 8));
+//     }
+//     return pool;
+// };
+
+var randomColorGenerator = function () { 
+  return '#' + (Math.random().toString(16) + '0000000').slice(2, 8); 
 };
 
 
-export default function MonthlyChart() {
+
+
+export default function CategoriesChart() {
   const [chartData, setChartData] = useState({
     labels: [] as String[], 
     datasets: [
       {
-        label: "monthly",
-        data: [0],
-        borderColor: 'rgb(255, 99, 132)',
+        label: "",
+        data: [] as number[],
+        // borderColor:  [] as string[],
+        // backgroundColor: [] as string[],
+        borderColor: 'rgb(255, 255, 255)', 
+        // backgroundColor: randomColorGenerator,
         borderWidth: 2
       }
     ]
   });
 
-  useEffect(() => {
 
+  useEffect(() => {
     const fetchData = async () => {
       const labs : String[] = [];
       const amnts : number[] = [];
-      await axios.get('api/expenses/stats/monthly')
+      await axios.get('api/expenses/stats/categories')
       .then(function (response: any) {
-        
+        console.log(response.data)
         for ( let dataObj of response.data ) {
-          labs.push(dataObj.date);
-          amnts.push(dataObj.dayTotal);
+          labs.push(dataObj.category ? dataObj.category : "Uncategorized");
+          amnts.push(dataObj.total);
         }
       })
       .catch(function (error: any) {
@@ -80,9 +105,10 @@ export default function MonthlyChart() {
         labels: labs, 
         datasets: [
           {
-            label: "monthly",
+            label: "categories",
             data: amnts,
-            borderColor: 'rgb(255, 99, 132)',
+            // backgroundColor:  randomColorGenerator,
+            borderColor: 'rgb(255, 255, 255)', 
             borderWidth: 2
           }
         ]
@@ -93,10 +119,9 @@ export default function MonthlyChart() {
   }, [])
 
 
-
   return(
     <div className="mx-3 px-3">
-      <Line
+      <Doughnut
         redraw={true}
         data={chartData}
         options={options}

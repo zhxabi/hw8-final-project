@@ -1,10 +1,26 @@
 import { ExpenseObj } from "../../features/expenses/expenseSlice";
-import { useEffect, useState } from "react";
+import { useEffect, useState,KeyboardEventHandler } from "react";
 import axios from "axios";
 import { Link, useNavigate } from "react-router-dom";
 import ShareExpense from "./shareExpense";
+import { MultiSelect } from "react-multi-select-component";
+import CreatableSelect from 'react-select/creatable';
 
-export default function ExpenseItem({ expense, username}: { expense: ExpenseObj, username: String }) {
+interface Option {
+  readonly label: string;
+  readonly value: string;
+}
+const components = {
+  DropdownIndicator: null,
+};
+
+const createOption = (label: string) => ({
+  label,
+  value: label,
+} as Option);
+
+
+export default function ExpenseItem({ expense, username, cats}: { expense: ExpenseObj, username: string, cats: string[] }) {
   const navigate = useNavigate();
   const [isEditBtn, setEditBtn] = useState(false);
   const [isDeleteBtn, setDeleteBtn] = useState(false);
@@ -15,14 +31,37 @@ export default function ExpenseItem({ expense, username}: { expense: ExpenseObj,
   const [sharedAmount, setSharedAmount] = useState(expense.sharedAmount);
   const [owner, setOwner] = useState(expense.owner);
   const [comment, setComment] = useState(expense.comment? expense.comment:"");
+  const [categories, setCategories] = useState(expense.categories);
+  const [catOptions, setCatOptions] = useState(cats.map((cat) => ({label: cat, value: cat})));
+  // const [value, setValue] = useState<Option | null>();
+  const [value, setValue] = useState<readonly Option[]>(expense.categories.map((cat) => ({label: cat, value: cat})));
+  const [isLoading, setIsLoading] = useState(false);
 
+
+
+  const handleCreate = (inputValue: string) => {
+    setIsLoading(true);
+    setTimeout(() => {
+      const newOption = createOption(inputValue);
+      setIsLoading(false);
+      setCatOptions((prev) => [...prev, newOption]);
+      setValue((prev) => [...prev, newOption]);
+    }, 1000);
+  };
+
+interface Option {
+  readonly label: string;
+  readonly value: string;
+}
 
   useEffect(() => {
     if(isSubmitBtn){
+      console.log(value)
       axios.put(`api/expenses/${expense._id}`, 
       {
         expenseAmount: expenseAmount,
         comment: comment,
+        categories: value.map((elt) => elt.label)
       }, 
       )
       .then(function (response: any) {
@@ -46,6 +85,7 @@ export default function ExpenseItem({ expense, username}: { expense: ExpenseObj,
       });
       setDeleteBtn(false)
     }
+    // console.log(catOptions)
   }, [expenseAmount, comment, isSubmitBtn, isEditBtn, isDeleteBtn]);
 
   return(
@@ -68,7 +108,24 @@ export default function ExpenseItem({ expense, username}: { expense: ExpenseObj,
             {Number(expenseAmount) === sharedAmount ? <></>  : 
             <div className='text-xl flex font-bold  text-teal-600 grow'>Each:     ${sharedAmount}</div>
             }
-            
+            {/* <input
+              readOnly={true} 
+              type="text"
+              value={categories}
+              placeholder="Add Category Here"
+              className='w-full my-2 bg-gray-100 read-only:bg-white'
+            /> */}
+           
+            <CreatableSelect
+              isClearable
+              isMulti
+              isDisabled={!isEditBtn || isLoading}
+              isLoading={isLoading}
+              onChange={(newValue) => setValue(newValue)}
+              onCreateOption={handleCreate}
+              options={catOptions}
+              value={value}
+            />
 
             <input
               readOnly={!isEditBtn} 
@@ -78,13 +135,15 @@ export default function ExpenseItem({ expense, username}: { expense: ExpenseObj,
               placeholder="Add Comment Here"
               className='w-full my-2 text-lg bg-gray-100 read-only:bg-white'
             />
+
+            
           </div>
 
-          <div className='flex flex-col w-1/4 justify-end text-teal-600 '>
+          <div className='flex flex-col w-1/4 justify-start text-teal-600 '>
             <div className='flex justify-end'>
             {(owner === username) ? owner : "shared by " + owner}
             </div>
-            {sharedUsers.map((usr) => ( <div className='flex justify-end text-amber-500'>{usr}</div>))}
+            {sharedUsers.map((usr, key) => ( <div key={key} className='flex justify-end text-amber-500'>{usr}</div>))}
           </div>
           
 

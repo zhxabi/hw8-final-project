@@ -6,6 +6,7 @@ export interface ExpenseObj {
   expenseAmount: number
   owner: string
   comment? : string
+  categories: [string]
   _id: number
   __v: number
   createdAt: Date

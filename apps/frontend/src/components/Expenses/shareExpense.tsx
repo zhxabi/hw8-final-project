@@ -18,7 +18,6 @@ export default function ShareExpense({ expense, cancelFunc }: { expense : Expens
   useEffect(() => {
     axios.get('api/users')
     .then(function (response: any) {
-      // console.log(response.data);
       setRes(response.data);
       
     })

@@ -2,17 +2,28 @@ import axios from "axios";
 import { ExpenseObj, MonthlySumObj } from "../../features/expenses/expenseSlice";
 import MonthlyChart from "./monthlyChart";
 import { useEffect, useState } from "react";
+import FriendsChart from "./friendsChart";
+import CategoriesChart from "./categoriesChart";
 
 
 export default function InsightPage() {
-  const [res, setRes] = useState<MonthlySumObj[]>([])
+  const [monthly, setMonthly] = useState<MonthlySumObj[]>([])
 
   useEffect(() => {
     
-    axios.get('api/expenses/monthly')
+    axios.get('api/expenses/stats/monthly')
     .then(function (response: any) {
       console.log(response.data);
-      setRes(response.data);
+      setMonthly(response.data);
+    })
+    .catch(function (error: any) {
+      console.log(error);
+    });
+
+    axios.get('api/expenses/stats/shared')
+    .then(function (response: any) {
+      console.log(response.data);
+      // setRes(response.data);
     })
     .catch(function (error: any) {
       console.log(error);
@@ -25,7 +36,9 @@ export default function InsightPage() {
       <div className="flex flex-row">
         <p className='text-2xl font-bold mx-3 px-3'> Insights</p>
       </div>
-      <MonthlyChart monthly={res} />
+      <MonthlyChart />
+      <FriendsChart />
+      <CategoriesChart />
     </div>
     )
 }
