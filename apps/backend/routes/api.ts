@@ -105,6 +105,18 @@ apiRouter.get('/categories', isAuthenticated, async function(req, res){
   }
 })
 
+apiRouter.get('/categories/:name', isAuthenticated, async function(req, res){
+  try{
+    // const exps = await Expense.find({$expr: {$in: [req.params.name, "$categories"]}});
+    const exps = await Expense.find({categories: req.params.name});
+    res.send(exps)
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Error getting categories!");
+  }
+  
+})
+
 apiRouter.get('/stats/categories', isAuthenticated, async function(req, res){
   try{
     const exps = await Expense.aggregate([

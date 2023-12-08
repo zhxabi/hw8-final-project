@@ -3,6 +3,7 @@ import ExpenseItem from "./expenseItem";
 import { useEffect, useState } from "react";
 import NewExpense from "./newExpense";
 import axios from "axios";
+import { Link } from "react-router-dom";
 
 export default function ExpensePage({ expenses }: { expenses : ExpenseObj[] }) {
   const [isNewBtn, setNewBtn] = useState(false);
@@ -61,6 +62,18 @@ export default function ExpensePage({ expenses }: { expenses : ExpenseObj[] }) {
       {isNewBtn ? 
         <NewExpense cancelFunc={setNewBtn} /> : <></> }
       </div>
+      <div className="flex flex-row my-3 mx-3 px-3">
+        <div className="flex max-w-sm px-2 mx-2 ">
+              By Category: 
+            </div>
+      {cats.map((cat, key) => {
+          return (
+            <div className="flex max-w-sm px-2 mx-2 rounded bg-neutral-200 " key={key}>
+              <Link to={`categories/${cat}`} className='text-teal-600 hover:text-teal-800'> {cat} </Link>
+            </div>
+          );  
+      })}
+      </div>
       {expenses.map((exp, key) => {
           return (
             <div key={key}>
@@ -68,6 +81,7 @@ export default function ExpensePage({ expenses }: { expenses : ExpenseObj[] }) {
             </div>
           );  
       })}
+      
       </div>
     )
 }

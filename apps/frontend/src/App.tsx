@@ -2,12 +2,17 @@ import SignupPage from './components/signuppage';
 import LoginPage from './components/loginpage';
 import HomePage from './components/homepage';
 import { RouterProvider, createBrowserRouter } from 'react-router-dom';
+import CategoriesPage from './components/Categories/categoriesPage';
 
 function App() {
   const router = createBrowserRouter([
     {
       path: "/",
       element: <HomePage />,
+    },
+    {
+      path: "/categories/:catName",
+      element: <CategoriesPage />,
       // errorElement: <ErrorPage />,
     },
     {

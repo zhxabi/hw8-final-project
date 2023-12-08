@@ -104,9 +104,9 @@ interface Option {
               placeholder="Amount"
               className='text-xl flex font-bold bg-gray-100 read-only:bg-white'
             />
-            </div>
+            </div >
             {Number(expenseAmount) === sharedAmount ? <></>  : 
-            <div className='text-xl flex font-bold  text-teal-600 grow'>Each:     ${sharedAmount}</div>
+            <div className='text-xl flex font-bold my-1 text-teal-600 grow'>Each:     ${sharedAmount}</div>
             }
             {/* <input
               readOnly={true} 
