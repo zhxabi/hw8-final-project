@@ -126,7 +126,6 @@ apiRouter.get('/stats/categories', isAuthenticated, async function(req, res){
         },
       }      
     ]);
-    console.log(exps);
     res.send(exps)
   } catch (err) {
     console.error(err);

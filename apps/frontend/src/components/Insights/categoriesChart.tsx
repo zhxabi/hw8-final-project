@@ -47,20 +47,7 @@ const options = {
   animation: {
     duration: 500
   },
-  // scales: {
-  //   y: {
-  //     suggestedMin: 0,
-  //   }
-  // }
 };
-
-// function randomColorGenerator(a: number): string[] { 
-//   var pool = [];
-//     for(let i = 0; i < a; i++) {
-//         pool.push((Math.random().toString(16) + '0000000').slice(2, 8));
-//     }
-//     return pool;
-// };
 
 var randomColorGenerator = function () { 
   return '#' + (Math.random().toString(16) + '0000000').slice(2, 8); 
@@ -92,7 +79,6 @@ export default function CategoriesChart() {
       const amnts : number[] = [];
       await axios.get('api/expenses/stats/categories')
       .then(function (response: any) {
-        console.log(response.data)
         for ( let dataObj of response.data ) {
           labs.push(dataObj.category ? dataObj.category : "Uncategorized");
           amnts.push(dataObj.total);
@@ -120,7 +106,7 @@ export default function CategoriesChart() {
 
 
   return(
-    <div className="mx-3 px-3">
+    <div className="mx-3 px-3 my-3">
       <Doughnut
         redraw={true}
         data={chartData}
