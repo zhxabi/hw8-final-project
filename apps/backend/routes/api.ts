@@ -114,7 +114,11 @@ apiRouter.get('/categories', isAuthenticated, async function(req, res){
 apiRouter.get('/categories/:name', isAuthenticated, async function(req, res){
   try{
     // const exps = await Expense.find({$expr: {$in: [req.params.name, "$categories"]}});
-    const exps = await Expense.find({categories: req.params.name});
+    const exps = await Expense.find({
+      $and:[{
+        $or:[ {owner: req.user!.username}, 
+              {$expr: {$in: [req.user!.username, "$sharedUsers"]}} ]}, 
+        {categories: req.params.name}]});
     res.send(exps)
   } catch (err) {
     console.error(err);
@@ -200,6 +204,7 @@ apiRouter.get('/stats/shared', isAuthenticated, async function(req, res){
           {$expr: {$in: [req.user!.username, "$sharedUsers"]}} ]
         }
       },
+      { $unwind: "$sharedUsers" },
       { $group: {
         _id: "$sharedUsers",  
         count: {
@@ -209,11 +214,15 @@ apiRouter.get('/stats/shared', isAuthenticated, async function(req, res){
       {
         $project: {
           _id: 0,
-          users: { $first: "$_id" }
+          users:  "$_id" 
           ,
           count: 1,
         },
-      }      
+      },
+      { $sort: {
+        "count": -1
+        },
+      }    
     ]);
     res.send(exps)
   } catch (err) {
